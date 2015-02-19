@@ -23,6 +23,7 @@ lastTime = 0;
 currentTune = "";
 
 ## Afspeeltijd in seconden
+## Set to 0 to play until end of file
 playMP3Duration = 20
 playMP3FadeDuration = 5
 MP3Dir = '/usr/local/rfidaudio/mp3'
@@ -170,7 +171,7 @@ def SoundPlayer(spEvent):
                 tossMP3(mp3)
                 while getPlayingMP3():
                     now = time.time();
-                    if(now - then) > playMP3Duration:
+                    if (playMP3Duration > 0) and ((now - then) > playMP3Duration):
                         stopMP3()
                         time.sleep(playMP3FadeDuration + 1)
                         ## Sleep terwijl de fade afloopt zodat daarna pas de RFID reader weer reset
