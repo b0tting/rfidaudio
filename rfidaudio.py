@@ -4,6 +4,7 @@ from keyboard_alike import reader
 import pygame
 import datetime
 import threading
+import traceback
 import time
 import logging
 from logging import handlers
@@ -136,11 +137,16 @@ def RFIDListener(spEvent):
 # AKA startSound
 def tossMP3(mp3):
     mp3file =  MP3Dir + '/' + mp3
-    global currentTune
-    currentTune = mp3
-    pygame.mixer.music.load(mp3file)
-    pygame.mixer.music.play()
-    logger.info("Now playing: " + mp3)
+    try:
+        global currentTune
+        currentTune = mp3
+        pygame.mixer.music.load(mp3file)
+        pygame.mixer.music.play()
+        logger.info("Now playing: " + mp3)
+    except Exception as e:
+        logger.error("Could not play MP3 file " + mp3file ". Does this file exist?")
+        traceback.print_exc()
+        
 
 def getPlayingMP3():
     if pygame.mixer.music.get_busy():
@@ -150,7 +156,10 @@ def getPlayingMP3():
         
 def stopMP3():
     logger.info("Fading mp3")
-    pygame.mixer.music.fadeout(playMP3FadeDuration * 1000)
+    if(getPlayingMP3()):
+        pygame.mixer.music.fadeout(playMP3FadeDuration * 1000)
+    else: 
+        logger.error("Tried to stop playing, but nothing was actually playing")
 ########
 
 
