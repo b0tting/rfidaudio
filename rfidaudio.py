@@ -44,9 +44,12 @@ def getConnection():
 
 def runUpdateQuery(query):
     conn = getConnection()
-    c = conn.cursor()
-    c.execute(query)
-    conn.commit()
+    try:
+        c = conn.cursor()
+        c.execute(query)
+        conn.commit()
+    except Exception as e:
+        logger.error('Failed with query ' + query)
     conn.close()
 
 def getNiceTime(seconds):
@@ -87,14 +90,17 @@ def getAllRFID():
     return niceResult
 
 def updateAccessTime(rfid):
+    logger.info("Updating access time for RFID " + rfid)
     runUpdateQuery("update known_rfid set lasttime = " + str(round(time.time())) + " where rfid = '" + lastRFID + "'")
 
 def updateOrInsertRFID(rfid, plin, mp3, god):
     current = fetchRFIDRecord(rfid)
     if(current):
         sql = "UPDATE known_rfid set plin = " + plin + ", mp3 = '" + mp3 + "', god = '" + god + "' where rfid = '" + rfid + "';"
+        logger.info("Attempting to update RFID " + rfid + " with values plin = " + plin + ", mp3 = '" + mp3 + "', god = '" + god)
     else: 
         sql = "INSERT INTO known_rfid VALUES ('" + rfid + "', " + plin + ", '" + mp3 + "', 0, '" + god + "');"
+        logger.info("Inserting new RFID " + rfid + ", values '" + rfid + "', " + plin + ", '" + mp3 + "', 0, '" + god + "'")
     runUpdateQuery(sql)
 
 def deleteRFID(rfid):
@@ -144,7 +150,7 @@ def tossMP3(mp3):
         pygame.mixer.music.play()
         logger.info("Now playing: " + mp3)
     except Exception as e:
-        logger.error("Could not play MP3 file " + mp3file ". Does this file exist?")
+        logger.error("Could not play MP3 file " + mp3file +". Does this file exist?")
         traceback.print_exc()
         
 
@@ -207,6 +213,11 @@ def editRFID(rfid):
     niceRFID = fetchRFIDRecord(rfid)
     ## Dat moet !@#$ toch makkelijker kunnen? Nu copypasta ik de index methode!
     return render_template('index.html', knownrfid = getAllRFID(), editrfid = niceRFID, mp3s = getAllMP3(), logs=getLogs())
+
+@app.route('/refreshlog')
+def refreshlog():
+    return render_template('index.html', knownrfid = getAllRFID(), editrfid = None, mp3s = getAllMP3(), logs=getLogs(), refreshlog = True)
+
 
 ## JSON code die toont of er nu een geluid loopt
 @app.route('/altarstate')

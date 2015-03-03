@@ -166,7 +166,8 @@ height: 100%
       </table>
 </div>
 <div class="tab-pane" id="blue">
-     <a href="/shutdown"><button type="button" class="btn btn-danger">Shutdown!</button></a><br>
+     <a href="/refreshlog"><button type="button" class="btn btn-default">Refresh log</button></a> 
+     <a href="/shutdown"><button type="button" class="btn btn-danger">Shutdown system!</button></a><br>
     {% for log in logs %}
     {{ log }}<br>
     {% endfor %}
@@ -203,6 +204,9 @@ function getPlaying(){
             // Template code om te zien welk tabblad geselecteerd mag worden
             {% if editrfid %}
               $('#tabs a[href="#orange"]').tab('show');
+            {% endif %}
+            {% if refreshlog is defined %}
+                $('#tabs a[href="#blue"]').tab('show');
             {% endif %}
             $('#known').DataTable({stateSave: true});
             $('#mp3table').DataTable({stateSave: true});
