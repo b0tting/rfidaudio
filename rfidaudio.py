@@ -25,8 +25,8 @@ currentTune = "";
 
 ## Afspeeltijd in seconden
 ## Set to 0 to play until end of file
-playMP3Duration = 20
-playMP3FadeDuration = 5
+playMP3Duration = 30
+playMP3FadeDuration = 2
 MP3Dir = '/usr/local/rfidaudio/mp3'
 logfile = '/var/log/rfidaudio'
 
@@ -129,29 +129,45 @@ def RFIDListener(spEvent):
     while (True):
         myReader.initialize()
         logger.info("Thread waiting for RFID")
-        value = myReader.read().strip();
-        logger.info("Received RFID: " + value);
-        lastRFID = value
-        lastTime = round(time.time());
-        myReader.disconnect()
-        if(spEvent.is_set()):
-            logger.info("..but already working onother key")
-        else: 
-            spEvent.set()
+        try: 
+            value = myReader.read().strip();
+            logger.info("Received RFID: " + value);
+            lastRFID = value
+            lastTime = round(time.time());
+            myReader.disconnect()
+            if(spEvent.is_set()):
+                logger.info("..but already working onother key")
+            elif(getPlayingMP3()):
+                logger.info("..but already playing a song")
+            else:
+                logger.info("Looking for sound now") 
+                spEvent.set()
+        except Exception as e:
+            logger.error("Could not read USD RFID, trying later")
+            time.sleep(2)
+            traceback.print_exc()
 
 ## Geluid functies
 # AKA startSound
-def tossMP3(mp3):
-    mp3file =  MP3Dir + '/' + mp3
-    try:
-        global currentTune
-        currentTune = mp3
-        pygame.mixer.music.load(mp3file)
-        pygame.mixer.music.play()
-        logger.info("Now playing: " + mp3)
-    except Exception as e:
-        logger.error("Could not play MP3 file " + mp3file +". Does this file exist?")
-        traceback.print_exc()
+def tossMP3(mp3, loop = 0):
+    if not getPlayingMP3():
+        mp3file =  MP3Dir + '/' + mp3
+        try:
+            global currentTune
+            currentTune = mp3
+            pygame.mixer.music.load(mp3file)
+            if loop == 1:
+                pygame.mixer.music.play(-1)
+                logger.info("Now looping: " + mp3)
+            else:
+                pygame.mixer.music.play()
+                logger.info("Now playing: " + mp3)
+        except Exception as e:
+            logger.error("Could not play MP3 file " + mp3file +". Does this file exist? Wrong format perhaps?")
+            traceback.print_exc()
+    else: 
+        logger.info("Somebody tried to fire " + mp3 + " but we are already playing something else")
+
         
 
 def getPlayingMP3():
@@ -230,8 +246,10 @@ def getAltarState():
 
 ## Geef opdracht om een audio stuk te starten op het altaar
 @app.route('/altarplay/<mp3>')
-def altarplay(mp3):
-    tossMP3(mp3)    
+@app.route('/altarplay/<mp3>/<loop>')
+def altarplay(mp3, loop = "0"):
+    loop = int(loop)
+    tossMP3(mp3, loop)    
     return redirect("/")
 
 ## Stop een spelende audio track

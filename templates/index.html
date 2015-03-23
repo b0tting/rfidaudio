@@ -156,9 +156,10 @@ height: 100%
             <tr>
                 <td>{{ mp3 }}</td>
                 <td>
-                    <a href="/altarplay/{{ mp3 }}"><button type="button" class="btn btn-primary">Speel op altaar</button></a>
-                    <a href="/localplay/{{ mp3 }}" target="_new"><button type="button" class="btn btn-primary">Speel hier</button></a>
-                    <a href="/deletemp3/{{ mp3 }}"><button type="button" class="btn btn-danger">Verwijder</button></a>
+                    <a href="/altarplay/{{ mp3 }}"><button type="button" class="btn btn-xs btn-primary">Speel op altaar</button></a>
+                    <a href="/altarplay/{{ mp3 }}/1"><button type="button" class="btn btn-xs btn-primary">Loop op altaar</button></a>
+                    <a href="/localplay/{{ mp3 }}" target="_new"><button type="button" class="btn btn-xs btn-primary">Speel hier</button></a>
+                    <a href="/deletemp3/{{ mp3 }}"><button type="button" class="btn btn-xs btn-danger">Verwijder</button></a>
                 </td>
             </tr>
         {% endfor %}
