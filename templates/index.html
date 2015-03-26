@@ -13,13 +13,11 @@
 <style>
 
 body {
-background: -moz-linear-gradient(top,  rgba(220,233,248,1) 0%, rgba(238,246,252,0.41) 59%, rgba(238,246,252,0) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(220,233,248,1)), color-stop(59%,rgba(238,246,252,0.41)), color-stop(100%,rgba(238,246,252,0))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  rgba(220,233,248,1) 0%,rgba(238,246,252,0.41) 59%,rgba(238,246,252,0) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  rgba(220,233,248,1) 0%,rgba(238,246,252,0.41) 59%,rgba(238,246,252,0) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  rgba(220,233,248,1) 0%,rgba(238,246,252,0.41) 59%,rgba(238,246,252,0) 100%); /* IE10+ */
-background: linear-gradient(to bottom,  rgba(220,233,248,1) 0%,rgba(238,246,252,0.41) 59%,rgba(238,246,252,0) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dce9f8', endColorstr='#00eef6fc',GradientType=0 ); /* IE6-9 */
+    background: url(/static/images/altaar.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover; /* For WebKit*/
+    -moz-background-size: cover;    /* Mozilla*/
+    -o-background-size: cover;      /* Opera*/
+    background-size: cover;         /* Generic*/
     padding-top: 50px;
 } 
 
@@ -40,7 +38,7 @@ height: 100%
     <![endif]-->
   </head>
   <body>
-<div class="container">
+<div class="container" style="background-color: rgba(255, 255, 255, 0.9); border-radius: 25px">
     <div class="mytitle">
         <h1>RFIDAudio</h1>
         <p>Koppel RFID tags aan audiobestanden en speel deze af indien herkent</p>
