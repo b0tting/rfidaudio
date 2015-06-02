@@ -21,6 +21,8 @@ Start script. Assuming it managed to connect to the RFID reader without errors, 
 Currently, audio triggered from the RFID fades after 20 seconds, you can change this by setting the playMP3Duration value in the script (to 0 for play until end).
 
 # Test setup
-This script was developed on a Raspberry Pi B and a Raspberry Pi B+. It works perfectly on the former, but I suggest the latter (or the Raspberry Pi 2) because USB got a little flaky with the RFID reader I used. Sound on the B+ is also audibly better. 
+This script was developed on a Raspberry Pi B and a Raspberry Pi B+. It works perfectly on the former, but I suggest the latter (or the Raspberry Pi 2) because USB got a little flaky with the RFID reader I used. Sound on the B+ is also audibly better.
+
+Suggestions for running this program on a RPI would be to add the following options to the RPI config.txt: "disable_audio_dither=1" to remove the hiss from the audio jack and "max_usb_current=1" to solve part of the USB flakyness. Also, disable wifi power management if the web frontend seems unavailable. 
 
 Stress testing was done by giving my toddler a handful of RFID tags linked to his favourite songs. 
