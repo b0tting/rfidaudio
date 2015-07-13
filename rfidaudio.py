@@ -136,7 +136,7 @@ def RFIDListener(spEvent):
             lastTime = round(time.time());
             myReader.disconnect()
             if(spEvent.is_set()):
-                logger.info("..but already working onother key")
+                logger.info("..but already working on other key")
             elif(getPlayingMP3()):
                 logger.info("..but already playing a song")
             else:
@@ -276,8 +276,13 @@ def deletemp3(mp3):
 @app.route('/shutdown')
 def shutdown():
     os.system("/sbin/shutdown -h now")
-    sys.exit(0)
-   
+    return redirect("/")
+
+## ..or reboot it
+@app.route('/reboot')
+def reboot():
+    os.system("/sbin/reboot")
+    return redirect("/")
 
 ## Save een RFID naar audio koppeling
 @app.route('/saverfid', methods=['POST'])
@@ -310,9 +315,24 @@ def fetchLastRFID():
     
     if niceRFID:
         logger.info(niceRFID)
-        return '{ "last":"'+ niceRFID['rfid'] +'", "time":"' + getNiceTime(diff) + ' ago", "isnew":false,"mp3":"' + niceRFID['mp3'] + '","plin":'+ str(niceRFID['plin']) + ',"god":"' + niceRFID['god'] + '"}'
+        lastrfid = niceRFID['rfid']
+        
+        ## This is a fix. If you hammer the USB with RFID devices it sometimes jams more then one into a single
+        ## keyboard sequence
+        if(len(lastrfid) > 10): 
+                lastrfid = lastrfid[:10]
+
+        return '{ "last":"'+ lastrfid +'", "time":"' + getNiceTime(diff) + ' ago", "isnew":false,"mp3":"' + niceRFID['mp3'] + '","plin":'+ str(niceRFID['plin']) + ',"god":"' + niceRFID['god'] + '"}'
     else:
-        return '{ "last":"' + str(lastRFID) + '", "time":"' + getNiceTime(diff) + ' ago",  "isnew":true }'
+        lastrfid = str(lastRFID)
+
+        ## This is a fix. If you hammer the USB with RFID devices it sometimes jams more then one into a single
+        ## keyboard sequence
+        if(len(lastrfid) > 10):
+                lastrfid = lastrfid[:10]
+
+        lastrfid = lastrfid[0:10]
+        return '{ "last":"' + lastrfid + '", "time":"' + getNiceTime(diff) + ' ago",  "isnew":true }'
 
 ####
 ## Main program
