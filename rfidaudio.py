@@ -154,8 +154,8 @@ def tossMP3(mp3, loop = 0, force = False):
         mp3file =  MP3Dir + '/' + mp3
         try:
             if getPlayingMP3() and force:
+                logger.info("We were playing " + getPlayingMP3() + " but now are forcing " + mp3);
                 pygame.mixer.stop();
-                logger.info("Now forcing next play and ignoring current");
             global currentTune
             currentTune = mp3
             pygame.mixer.music.load(mp3file)
@@ -252,14 +252,16 @@ def getAltarState():
 @app.route('/altarplay/<mp3>/<loop>')
 def altarplay(mp3, loop = "0"):
     loop = int(loop)
+    logger.info("Forcing " + mp3 + " MP3 start from http call")
     tossMP3(mp3, loop, True)
-    return redirect("/")
+    return ('{ "altarplay" : true }')
 
 ## Stop een spelende audio track
 @app.route('/altarplaystop')
 def altarplaystop():
+    logger.info("Forcing sound stop from http call")
     stopMP3()
-    return redirect("/")
+    return ('{ "altarstop" : true }')
 
 
 ## Stuur een audio bestand naar de client
@@ -270,6 +272,7 @@ def localplay(mp3):
 ## Verwijder een gegeven bestand
 @app.route('/deletemp3/<mp3>')
 def deletemp3(mp3):
+    logger.info("Delete MP3 " + mp3)
     ## Om eventuele grappenmakers tegen te gaan check ik of er geen directory traversal plaats vind 
     if "/" not in mp3:
         os.remove(MP3Dir + "/" + mp3)
@@ -278,12 +281,14 @@ def deletemp3(mp3):
 ## Shut the dajumn thing down
 @app.route('/shutdown')
 def shutdown():
+    logger.info("Shutdown command given")
     os.system("/sbin/shutdown -h now")
     return redirect("/")
 
 ## ..or reboot it
 @app.route('/reboot')
 def reboot():
+    logger.info("Reboot command given")
     os.system("/sbin/reboot")
     return redirect("/")
 
@@ -297,6 +302,7 @@ def saverfid():
 
 @app.route('/deleterfid/<rfid>')
 def deleterfid(rfid):
+    logger.info("Deleting RFID " + rfid)
     deleteRFID(rfid)
     return redirect("/")
 
@@ -310,6 +316,7 @@ def setvolume(newvol):
 def saveMP3():
     file = request.files['newmp3']  
     filename = secure_filename(file.filename)
+    logger.info("Saving new MP3 " + filename)
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return redirect("/")        
 

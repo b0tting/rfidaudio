@@ -77,7 +77,7 @@ height: 100%
   		<tr>
           <td><a href="/edit/{{ tag.rfid }}">{{ tag.rfid }}</a></td>
           <td>{{ tag.plin }}</td>
-          <td><a href="/altarplay/{{ tag.mp3 }}">{{ tag.mp3 }}</a></td>
+          <td><button name="altarplay" song="{{ tag.mp3 }}" type="button" class="btn btn-xs btn-primary">{{ tag.mp3 }}</button></td>
           <td>{{ tag.god }}</td>
           <td>{{ tag.lasttime }}</td>
       </tr>
@@ -172,8 +172,8 @@ height: 100%
 </div>
 <div class="tab-pane" id="blue">
      <a href="/refreshlog"><button type="button" class="btn btn-default">Refresh log</button></a> 
-     <a href="/reboot"><button type="button" class="btn btn-danger">Reboot system!</button></a>
-     <a href="/shutdown"><button type="button" class="btn btn-danger">Shutdown system!</button></a><br>
+     <button name="reboot" type="button" class="btn btn-danger">Reboot system!</button>
+     <button name="shutdown" type="button" class="btn btn-danger">Shutdown system!</button><br>
     {% for log in logs %}
     {{ log }}<br>
     {% endfor %}
@@ -241,6 +241,13 @@ noUiSlider.create(slider, {
                  $.get( "/altarplaystop");
              })
 
+             $('button[name=shutdown]').click(function() {
+                 $.get( "/shutdown");
+             })
+
+             $('button[name=reboot]').click(function() {
+                 $.get( "/reboot");
+             })
 
 
             $('#tabs').tab();
