@@ -151,6 +151,7 @@ def RFIDListener(spEvent):
 # AKA startSound
 def tossMP3(mp3, loop = 0, force = False):
     if not getPlayingMP3() or force:
+        ## Dit is een aardig moment om de event queue te clearen, die schijnt anders vol te lopen
         mp3file =  MP3Dir + '/' + mp3
         try:
             if getPlayingMP3() and force:
@@ -185,6 +186,7 @@ def stopMP3():
         pygame.mixer.music.fadeout(playMP3FadeDuration * 1000)
     else: 
         logger.error("Tried to stop playing, but nothing was actually playing")
+
 ########
 
 
@@ -217,7 +219,6 @@ def SoundPlayer(spEvent):
                 logger.info("No match found for " + str(lastRFID)) 
         spEvent.clear()
         logger.info("Ready for next assignment")
-
 
 ## Alle routing
 app = Flask(__name__)

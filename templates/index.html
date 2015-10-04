@@ -48,7 +48,7 @@ height: 100%
 
 <div id="content">
     <div style="width: 100%; height: 100px;">
-      <h4>Playing <span id="playing">(niets)</span>&nbsp;<span id="playingbox"><button name="altarplaystop" type="button" class="btn btn-sm btn-danger">Fade en stop</button></span></h4>
+      <h4><span id="playing">(Waiting for server)</span>&nbsp;<span id="playingbox"><button name="altarplaystop" type="button" class="btn btn-sm btn-danger">Fade en stop</button></span></h4>
         <div id="range"></div>
     </div>
 
@@ -195,16 +195,22 @@ height: 100%
     <!-- Functie die zichzelf aanroep om lopende audio tracks te tonen -->
 function getPlaying(){
     var feedback;
-    $.getJSON("/altarstate", function(data){
-        if(data.playing){
-                $('#playing').html(data.playstate);
-                $('#playingbox').show()
-                slider.noUiSlider.set(data.volume)
+    $.getJSON("/altarstate", function (data) {
+        if (data.playing) {
+            $('#playing').html("Playing " + data.playstate);
+            $('#playingbox').show()
+            slider.noUiSlider.set(data.volume)
         } else {
-                $('#playingbox').hide()
-                slider.noUiSlider.set(data.volume)
-        }   
-        setTimeout(function(){getPlaying();}, 2000);
+            $('#playing').html("Waiting for MP3");
+            $('#playingbox').hide()
+            slider.noUiSlider.set(data.volume)
+        }
+    }).error(function() {
+        $('#playing').html("Could not contact server!");
+    }).complete(function () {
+        setTimeout(function () {
+            getPlaying();
+        }, 2000);
     });
 }
     var slider = document.getElementById('range');
