@@ -127,24 +127,29 @@ def RFIDListener(spEvent):
     myReader = reader.Reader(0x08ff, 0x0009, 84, 16, should_reset=False)
     logger.info("Starting reader")
     while (True):
-        myReader.initialize()
-        logger.info("Thread waiting for RFID")
-        try: 
-            value = myReader.read().strip();
-            logger.info("Received RFID: " + value);
-            lastRFID = value
-            lastTime = round(time.time());
-            myReader.disconnect()
-            if(spEvent.is_set()):
-                logger.info("..but already working on other key")
-            elif(getPlayingMP3()):
-                logger.info("..but already playing a song")
-            else:
-                logger.info("Looking for sound now") 
-                spEvent.set()
+        try:
+            myReader.initialize()
+            logger.info("Thread waiting for RFID")
+            try: 
+                value = myReader.read().strip();
+                logger.info("Received RFID: " + value);
+                lastRFID = value
+                lastTime = round(time.time());
+                myReader.disconnect()
+                if(spEvent.is_set()):
+                    logger.info("..but already working on other key")
+                elif(getPlayingMP3()):
+                    logger.info("..but already playing a song")
+                else:
+                    logger.info("Looking for sound now") 
+                    spEvent.set()
+            except Exception as e:
+                logger.error("Could not read USD RFID, trying later")
+                time.sleep(2)
+                traceback.print_exc()
         except Exception as e:
-            logger.error("Could not read USD RFID, trying later")
-            time.sleep(2)
+            logger.error("WARNING! Could not initalize USB reader! Trying again in 60 seconds")
+            time.sleep(60)
             traceback.print_exc()
 
 ## Geluid functies
