@@ -29,6 +29,7 @@ playMP3Duration = 30
 playMP3FadeDuration = 2
 MP3Dir = '/usr/local/rfidaudio/mp3'
 logfile = '/var/log/rfidaudio'
+volume = 100
 
 ## Setup logging
 logger = logging.getLogger(__name__)
@@ -156,7 +157,10 @@ def RFIDListener(spEvent):
 # AKA startSound
 def tossMP3(mp3, loop = 0, force = False):
     if not getPlayingMP3() or force:
-        ## Dit is een aardig moment om de event queue te clearen, die schijnt anders vol te lopen
+        if not pygame.mixer.get_init():
+            logger.info("Now initalizing mixer")
+            pygame.mixer.init()
+        pygame.mixer.music.set_volume(float(volume) / 100)
         mp3file =  MP3Dir + '/' + mp3
         try:
             if getPlayingMP3() and force:
@@ -180,7 +184,7 @@ def tossMP3(mp3, loop = 0, force = False):
         
 
 def getPlayingMP3():
-    if pygame.mixer.music.get_busy():
+    if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
         return currentTune
     else:
         return False
@@ -189,6 +193,8 @@ def stopMP3():
     logger.info("Fading mp3")
     if(getPlayingMP3()):
         pygame.mixer.music.fadeout(playMP3FadeDuration * 1000)
+        time.sleep(playMP3FadeDuration)        
+        pygame.mixer.quit()
     else: 
         logger.error("Tried to stop playing, but nothing was actually playing")
 
@@ -197,7 +203,6 @@ def stopMP3():
 
 ## Badly named, general event handler, kicks audio into action on RFID event
 def SoundPlayer(spEvent):
-    pygame.mixer.init()
     while not spEvent.isSet():
         event_is_set = spEvent.wait()
         if(event_is_set):
@@ -249,9 +254,9 @@ def refreshlog():
 def getAltarState():
     mp3 = getPlayingMP3()
     if(mp3):
-        return ('{ "playing": true, "playstate":"' + mp3 + '" , "volume":' + str(pygame.mixer.music.get_volume() * 100) + '}')
+        return ('{ "playing": true, "playstate":"' + mp3 + '" , "volume":' + str(volume) + '}')
     else: 
-        return ('{ "playing" : false , "volume":' + str(pygame.mixer.music.get_volume() * 100) + '}')
+        return ('{ "playing" : false , "volume":' +str(volume)+ '}')
 
 ## Geef opdracht om een audio stuk te starten op het altaar
 @app.route('/altarplay/<mp3>')
@@ -315,7 +320,10 @@ def deleterfid(rfid):
 ## Set volume van de pygame unit
 @app.route('/setvolume/<newvol>')
 def setvolume(newvol):
-    pygame.mixer.music.set_volume(float(newvol) / 100)
+    global volume 
+    volume = int(newvol)
+    if(getPlayingMP3()):
+        pygame.mixer.music.set_volume(float(volume) / 100)
     return getAltarState();
 
 @app.route('/savemp3', methods=['POST'])
